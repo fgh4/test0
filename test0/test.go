@@ -59,11 +59,20 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	}
 	Bval, _ = strconv.Atoi(string(Bvalbytes))
 
+	fmt.Printf("Before transaction Aval = %d, Bval = %d\n", Aval, Bval)
 	// Perform the execution
 	X, err = strconv.Atoi(args[2])
+	if err != nil {
+		return nil, errors.New("Failed to convert value to integer")
+	}
+	
+	if Aval < X {
+		return nil, errors.New("Value is too large")
+	}
+	
 	Aval = Aval - X
 	Bval = Bval + X
-	fmt.Printf("Aval = %d, Bval = %d\n", Aval, Bval)
+	fmt.Printf("After transaction Aval = %d, Bval = %d\n", Aval, Bval)
 
 	// Write the state back to the ledger
 	err = stub.PutState(A, []byte(strconv.Itoa(Aval)))
